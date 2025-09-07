@@ -1,1 +1,18 @@
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40'><text x='0' y='25' font-size='20' fill='#6ee7ff'>ScaleUp</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#6ee7ff"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g transform="translate(4,4)">
+    <path d="M16,4 C10,4 8,8 12,10 C16,12 20,12 20,16 C20,20 14,20 10,22 C6,24 8,28 14,28 C18,28 22,26 24,24"
+          fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" filter="url(#soft)"/>
+    <circle cx="20.5" cy="14.5" r="1.5" fill="#e6edf3"/>
+  </g>
+  <text x="52" y="26" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="20" font-weight="800" fill="#e6edf3">ScaleUp</text>
+</svg>

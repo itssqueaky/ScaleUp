@@ -1,7 +1,7 @@
-# ScaleUp — Snake (Render-ready v6)
+# ScaleUp — Snake (Render-ready v6.2)
 
-- Mobilstøtte: on-screen D-pad + swipe.
-- Fjernet footer-tekst.
+- Full app gjenopprettet (Snake + leaderboard + mobilkontroller + modal popup).
+- Modal-stiler inkludert (How it works popup fungerer).
 - Beholder: Top-3 highlight, 30m auto-reset (client+server), unik wallet per plass, +10 score, X-ikon, sticky contract bar.
 - Render-klar: vedvarende disk via `DATA_DIR`, runtime `/config.js` fra env vars.
 
