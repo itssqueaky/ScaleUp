@@ -2,243 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <title>ScaleUp — Snake</title>
-  <meta name="description" content="Play Snake, enter your wallet, and climb the top-10 leaderboard. Rewards every 30 minutes." />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <style>
-    :root {
-      --bg: #0b0f14;
-      --card: #10161f;
-      --muted: #8892a6;
-      --text: #e6edf3;
-      --accent: #6ee7ff;
-      --accent-2: #8b5cf6;
-      --good: #22c55e;
-      --bad: #ef4444;
-      --border: #1f2a37;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 14px;
-      --gold: #fbbf24;
-      --silver: #c0cbd7;
-      --bronze: #d97706;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
-      background: radial-gradient(1200px 800px at 70% -10%, rgba(110,231,255,0.07), transparent 60%), var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-    header { position: sticky; top: 0; z-index: 30; backdrop-filter: blur(6px); background: linear-gradient(to bottom, rgba(11,15,20,.9), rgba(11,15,20,.6)); border-bottom: 1px solid var(--border); }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 12px; }
-    .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .3px; }
-    .brand img { width: 140px; height: auto; display:block; }
-    .left { display:flex; align-items:center; gap:12px; }
-    .xlink { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:10px; border:1px solid var(--border); background:#0d131b; }
-    .xlink:hover { transform: translateY(-1px); }
-    .xicon { width:18px; height:18px; display:block; }
-    .actions { display:flex; gap:10px; align-items:center; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); background: #0d131b; border-radius: 999px; color: var(--muted); font-size: 12px; }
-    .hero { padding: 40px 0 20px; display: grid; gap: 14px; text-align: center; }
-    .hero h1 { font-size: clamp(26px, 6vw, 40px); line-height: 1.1; margin: 0; }
-    .sub { color: var(--muted); max-width: 780px; margin: 0 auto; white-space: pre-wrap; }
-    .grid { display: grid; gap: 20px; grid-template-columns: 1.25fr .75fr; }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
-    .card { background: linear-gradient(180deg, rgba(16,22,31,.7), rgba(16,22,31,.6)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-    .card .hd { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    .card .bd { padding: 14px; }
-    .input-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content:center; }
-    input[type="text"] { flex: 1 1 260px; border-radius: 10px; padding: 12px 14px; border: 1px solid var(--border); background: #0c1219; color: var(--text); outline: none; font-size: 14px; max-width:520px; }
-    input[type="text"]::placeholder { color: #5d6a7f; }
-    button { border: 1px solid var(--border); background: linear-gradient(180deg, #16202c, #111825); color: var(--text); border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; transition: transform .02s ease, box-shadow .2s ease; box-shadow: 0 8px 16px rgba(0,0,0,.25); font-size:14px; }
-    button:hover { transform: translateY(-1px); } button:active { transform: translateY(1px); }
-    .btn-accent { background: linear-gradient(130deg, var(--accent), var(--accent-2)); color: #031018; border: none; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .ok { color: var(--good); } .bad { color: var(--bad); }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; padding: 2px 6px; border: 1px solid var(--border); border-radius: 6px; background: #0b1118; color: var(--muted); }
-    .game-wrap { display: grid; gap: 8px; position:relative; }
-    .overlay-center { position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; color:#cbd5e1; text-shadow:0 2px 8px rgba(0,0,0,.6); font-weight:700; font-size:20px; }
-    canvas { width: 100%; height: auto; background: linear-gradient(180deg,#04101a,#02070c); border-radius: 10px; border: 1px solid var(--border); max-height: 70vh; }
-    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .leader { display: grid; gap: 10px; }
-    .row { display: grid; grid-template-columns: 56px 1fr 80px; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: #0c1219; }
-    .rank { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #0b0f14; border: 1px solid var(--border); font-weight: 700; color: var(--accent); }
-    .row.top1 { border-color: rgba(251,191,36,.5); box-shadow: 0 0 0 1px rgba(251,191,36,.25) inset, 0 8px 20px rgba(251,191,36,.08); background: linear-gradient(180deg, rgba(251,191,36,.08), rgba(16,22,31,.6)); }
-    .row.top2 { border-color: rgba(192,203,215,.5); box-shadow: 0 0 0 1px rgba(192,203,215,.25) inset, 0 8px 20px rgba(192,203,215,.08); background: linear-gradient(180deg, rgba(192,203,215,.08), rgba(16,22,31,.6)); }
-    .row.top3 { border-color: rgba(217,119,6,.5); box-shadow: 0 0 0 1px rgba(217,119,6,.25) inset, 0 8px 20px rgba(217,119,6,.08); background: linear-gradient(180deg, rgba(217,119,6,.08), rgba(16,22,31,.6)); }
-    .rank.top1 { color: var(--gold); } .rank.top2 { color: var(--silver); } .rank.top3 { color: var(--bronze); }
-    .addr { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .score { text-align: right; font-weight: 700; }
-    .reset-note { color: var(--muted); font-size: 12px; margin-top: 6px; }
-    footer { text-align: center; color: var(--muted); padding: 36px 0 56px; }
-    .tiny { font-size: 12px; }
-    .timer { font-variant-numeric: tabular-nums; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display:none; z-index: 50; }
-    .modal { position: fixed; inset: 0; display:none; z-index: 60; align-items: center; justify-content: center; padding: 20px; }
-    .modal .content { width: min(720px, 92vw); background: #0e1520; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
-    .modal .hd { display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-    .modal .bd { padding: 16px; color: var(--muted); white-space: pre-wrap; }
-    .xbtn { background:#0d131b; border:1px solid var(--border); padding:6px 10px; border-radius:8px; cursor:pointer; }
-
-    /* Sticky address bar */
-    .addrbar { position: fixed; left:0; right:0; bottom:0; z-index:70; display:flex; align-items:center; justify-content:center;
-               padding: 10px 14px; background: rgba(11,15,20,.9); border-top:1px solid var(--border); backdrop-filter: blur(6px); }
-    .addrbar .copy { cursor:pointer; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color:#e6edf3; }
-    .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 64px; background:#0e1520; color:#e6edf3; border:1px solid var(--border); padding:8px 12px; border-radius:10px; box-shadow: var(--shadow); display:none; z-index:80; font-size:13px; }
-    /* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  display: none;
-  z-index: 90;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal .content {
-  background: #10161f;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  max-width: 520px;
-  width: 92%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow);
-  animation: pop .25s ease;
-}
-
-.modal .hd {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.modal .bd {
-  padding: 16px;
-  white-space: pre-line;
-  line-height: 1.6;
-}
-
-.modal .xbtn {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 14px;
-}
-
-@keyframes pop {
-  from { transform: scale(.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
+    body{margin:0;font-family:system-ui;background:#0b0f14;color:#e6edf3;}
+    header{position:sticky;top:0;background:rgba(11,15,20,.9);border-bottom:1px solid #1f2a37;}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;height:64px;}
+    canvas{width:100%;max-height:64vh;background:#02070c;border:1px solid #1f2a37;border-radius:10px;}
+    /* Modal styles */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;z-index:90;}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:100;}
+    .modal .content{background:#10161f;border:1px solid #1f2a37;border-radius:14px;max-width:520px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:pop .25s ease;}
+    .modal .hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #1f2a37;}
+    .modal .bd{padding:16px;white-space:pre-line;line-height:1.6;}
+    .modal .xbtn{border:none;background:transparent;color:#8892a6;cursor:pointer;}
+    @keyframes pop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap nav">
-      <div class="left">
-        <a id="xLink" class="xlink" href="#" target="_blank" rel="noopener" aria-label="X (Twitter)" style="display:none">
-          <svg class="xicon" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="currentColor" d="M18.244 2H21l-6.49 7.41L22.5 22h-6.31l-4.95-6.42L5.5 22H3l6.9-7.88L1.5 2h6.31l4.5 5.84L18.244 2Zm-1.106 18h1.706L7.094 4H5.388L17.138 20Z"/>
-          </svg>
-        </a>
-        <div class="brand">
-          <img src="./logo.svg" alt="ScaleUp logo" />
-          <div class="pill">Rewards every <strong>30m</strong></div>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="howBtn">How it works</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <section class="hero">
-      <h1>ScaleUp the leaderboard.</h1>
-      <p class="sub">play games, win life changing money. Compete for top 3 spots - win 100% creator rewards every 30 mins.</p>
-      <div class="card">
-        <div class="bd">
-          <div class="input-row">
-            <input id="wallet" type="text" inputmode="text" placeholder="Solana wallet (Base58)" autocomplete="off" />
-            <button id="playBtn" class="btn-accent">Play</button>
-          </div>
-          <p class="muted" id="walletMsg">Wallet required to submit scores. This demo only checks Base58 format.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="grid" style="margin-top: 16px;">
-      <div class="card">
-        <div class="hd">
-          <strong>#1: Snake</strong>
-          <div class="muted">Next rewards in <span class="timer" id="timer">--:--</span></div>
-        </div>
-        <div class="bd">
-          <div class="game-wrap">
-            <div class="overlay-center" id="tapHint">Arrow Keys / WASD to start</div>
-            <canvas id="board" width="480" height="560" aria-label="Snake game area"></canvas>
-            <div class="controls">
-              <button id="start">START</button>
-              <button id="pause">PAUSE</button>
-              <span class="muted">Score: <strong id="score">0</strong></span>
-              <span class="muted">Controls: <span class="kbd">← ↑ → ↓</span> / <span class="kbd">W A S D</span></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="hd">
-          <strong>Top 10</strong>
-          <span class="muted" id="lbStatus">Loading…</span>
-        </div>
-        <div class="bd">
-          <div class="leader" id="leader"></div>
-          <div class="reset-note" id="resetNote"></div>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <p class="tiny">Demo template. Replace branding and connect a real wallet adapter if needed.</p>
-    </footer>
-  </main>
-
-  <!-- Sticky address bar -->
-  <div class="addrbar" id="addrbar" style="display:none;">
-    <span id="contractAddr" class="copy" title="Click to copy"></span>
-  </div>
-  <div class="toast" id="toast">Copied!</div>
-
-  <!-- Modal -->
+  <header><div class="wrap"><div class="brand"><img src="./logo.svg" alt="logo"></div><button id="howBtn">How it works</button></div></header>
+  <main class="wrap"><h1>ScaleUp the leaderboard.</h1><p>Play Snake and compete for rewards every 30 minutes.</p><canvas id="board" width="480" height="560"></canvas></main>
   <div class="modal-backdrop" id="backdrop"></div>
   <div class="modal" id="modal">
     <div class="content">
-      <div class="hd">
-        <strong>How it works</strong>
-        <button class="xbtn" id="closeModal">Close</button>
-      </div>
+      <div class="hd"><strong>How it works</strong><button class="xbtn" id="closeModal">Close</button></div>
       <div class="bd" id="howText"></div>
     </div>
   </div>
-
-  <script src="./config.js"></script>
+  <script src="/config.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
