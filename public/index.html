@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <title>ScaleUp — Snake</title>
-  <meta name="description" content="Play Snake, enter your wallet, and climb the top-10 leaderboard. Rewards every 30 minutes." />
+  <meta name="description" content="Play Snake and compete for top 3 spots. Rewards every 30 minutes." />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <style>
     :root {
@@ -31,6 +31,7 @@
       background: radial-gradient(1200px 800px at 70% -10%, rgba(110,231,255,0.07), transparent 60%), var(--bg);
       color: var(--text);
       line-height: 1.5;
+      -webkit-tap-highlight-color: transparent;
     }
     header { position: sticky; top: 0; z-index: 30; backdrop-filter: blur(6px); background: linear-gradient(to bottom, rgba(11,15,20,.9), rgba(11,15,20,.6)); border-bottom: 1px solid var(--border); }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
@@ -38,13 +39,13 @@
     .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .3px; }
     .brand img { width: 140px; height: auto; display:block; }
     .left { display:flex; align-items:center; gap:12px; }
-    .xlink { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:10px; border:1px solid var(--border); background:#0d131b; }
+    .xlink { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; border:1px solid var(--border); background:#0d131b; }
     .xlink:hover { transform: translateY(-1px); }
-    .xicon { width:18px; height:18px; display:block; }
+    .xicon { width:20px; height:20px; display:block; }
     .actions { display:flex; gap:10px; align-items:center; }
     .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); background: #0d131b; border-radius: 999px; color: var(--muted); font-size: 12px; }
-    .hero { padding: 40px 0 20px; display: grid; gap: 14px; text-align: center; }
-    .hero h1 { font-size: clamp(26px, 6vw, 40px); line-height: 1.1; margin: 0; }
+    .hero { padding: 32px 0 16px; display: grid; gap: 12px; text-align: center; }
+    .hero h1 { font-size: clamp(24px, 6vw, 40px); line-height: 1.1; margin: 0; }
     .sub { color: var(--muted); max-width: 780px; margin: 0 auto; white-space: pre-wrap; }
     .grid { display: grid; gap: 20px; grid-template-columns: 1.25fr .75fr; }
     @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
@@ -52,9 +53,9 @@
     .card .hd { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
     .card .bd { padding: 14px; }
     .input-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content:center; }
-    input[type="text"] { flex: 1 1 260px; border-radius: 10px; padding: 12px 14px; border: 1px solid var(--border); background: #0c1219; color: var(--text); outline: none; font-size: 14px; max-width:520px; }
+    input[type="text"] { flex: 1 1 260px; border-radius: 10px; padding: 14px 16px; border: 1px solid var(--border); background: #0c1219; color: var(--text); outline: none; font-size: 16px; max-width:520px; }
     input[type="text"]::placeholder { color: #5d6a7f; }
-    button { border: 1px solid var(--border); background: linear-gradient(180deg, #16202c, #111825); color: var(--text); border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; transition: transform .02s ease, box-shadow .2s ease; box-shadow: 0 8px 16px rgba(0,0,0,.25); font-size:14px; }
+    button { border: 1px solid var(--border); background: linear-gradient(180deg, #16202c, #111825); color: var(--text); border-radius: 12px; padding: 12px 16px; font-weight: 700; cursor: pointer; transition: transform .02s ease, box-shadow .2s ease; box-shadow: 0 8px 16px rgba(0,0,0,.25); font-size:16px; }
     button:hover { transform: translateY(-1px); } button:active { transform: translateY(1px); }
     .btn-accent { background: linear-gradient(130deg, var(--accent), var(--accent-2)); color: #031018; border: none; }
     .muted { color: var(--muted); font-size: 13px; }
@@ -62,7 +63,7 @@
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; padding: 2px 6px; border: 1px solid var(--border); border-radius: 6px; background: #0b1118; color: var(--muted); }
     .game-wrap { display: grid; gap: 8px; position:relative; }
     .overlay-center { position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; color:#cbd5e1; text-shadow:0 2px 8px rgba(0,0,0,.6); font-weight:700; font-size:20px; }
-    canvas { width: 100%; height: auto; background: linear-gradient(180deg,#04101a,#02070c); border-radius: 10px; border: 1px solid var(--border); max-height: 70vh; }
+    canvas { width: 100%; height: auto; background: linear-gradient(180deg,#04101a,#02070c); border-radius: 10px; border: 1px solid var(--border); max-height: 64vh; touch-action: none; }
     .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .leader { display: grid; gap: 10px; }
     .row { display: grid; grid-template-columns: 56px 1fr 80px; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: #0c1219; }
@@ -74,17 +75,15 @@
     .addr { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .score { text-align: right; font-weight: 700; }
     .reset-note { color: var(--muted); font-size: 12px; margin-top: 6px; }
-    footer { text-align: center; color: var(--muted); padding: 36px 0 56px; }
-    .tiny { font-size: 12px; }
-    .timer { font-variant-numeric: tabular-nums; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display:none; z-index: 50; }
-    .modal { position: fixed; inset: 0; display:none; z-index: 60; align-items: center; justify-content: center; padding: 20px; }
-    .modal .content { width: min(720px, 92vw); background: #0e1520; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
-    .modal .hd { display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-    .modal .bd { padding: 16px; color: var(--muted); white-space: pre-wrap; }
-    .xbtn { background:#0d131b; border:1px solid var(--border); padding:6px 10px; border-radius:8px; cursor:pointer; }
-
-    /* Sticky address bar */
+    .mobile-ctrls { display:none; gap:10px; margin-top: 10px; justify-content:center; }
+    .pad { display:grid; grid-template-columns: 56px 56px 56px; grid-template-rows: 56px 56px 56px; gap:8px; }
+    .pad button { width:56px; height:56px; font-size:18px; border-radius:12px; }
+    .pad .empty { visibility:hidden; }
+    @media (pointer: coarse), (max-width: 640px) {
+      .mobile-ctrls { display:flex; }
+      .kbd { display:none; }
+      canvas { max-height: 58vh; }
+    }
     .addrbar { position: fixed; left:0; right:0; bottom:0; z-index:70; display:flex; align-items:center; justify-content:center;
                padding: 10px 14px; background: rgba(11,15,20,.9); border-top:1px solid var(--border); backdrop-filter: blur(6px); }
     .addrbar .copy { cursor:pointer; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color:#e6edf3; }
@@ -133,14 +132,27 @@
           <div class="muted">Next rewards in <span class="timer" id="timer">--:--</span></div>
         </div>
         <div class="bd">
-          <div class="game-wrap">
-            <div class="overlay-center" id="tapHint">Arrow Keys / WASD to start</div>
+          <div class="game-wrap" id="gameWrap">
+            <div class="overlay-center" id="tapHint">Tap / Swipe / D‑pad to start</div>
             <canvas id="board" width="480" height="560" aria-label="Snake game area"></canvas>
             <div class="controls">
               <button id="start">START</button>
               <button id="pause">PAUSE</button>
               <span class="muted">Score: <strong id="score">0</strong></span>
-              <span class="muted">Controls: <span class="kbd">← ↑ → ↓</span> / <span class="kbd">W A S D</span></span>
+              <span class="muted desktop-hint">Controls: <span class="kbd">← ↑ → ↓</span> / <span class="kbd">W A S D</span></span>
+            </div>
+            <div class="mobile-ctrls">
+              <div class="pad">
+                <span class="empty"></span>
+                <button id="btnUp">▲</button>
+                <span class="empty"></span>
+                <button id="btnLeft">◀</button>
+                <span class="empty"></span>
+                <button id="btnRight">▶</button>
+                <span class="empty"></span>
+                <button id="btnDown">▼</button>
+                <span class="empty"></span>
+              </div>
             </div>
           </div>
         </div>
@@ -157,19 +169,13 @@
         </div>
       </div>
     </section>
-
-    <footer>
-      <p class="tiny">Demo template. Replace branding and connect a real wallet adapter if needed.</p>
-    </footer>
   </main>
 
-  <!-- Sticky address bar -->
   <div class="addrbar" id="addrbar" style="display:none;">
     <span id="contractAddr" class="copy" title="Click to copy"></span>
   </div>
   <div class="toast" id="toast">Copied!</div>
 
-  <!-- Modal -->
   <div class="modal-backdrop" id="backdrop"></div>
   <div class="modal" id="modal">
     <div class="content">
@@ -181,7 +187,7 @@
     </div>
   </div>
 
-  <script src="./config.js"></script>
+  <script src="/config.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

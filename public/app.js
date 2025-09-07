@@ -21,29 +21,23 @@ const els = {
   addrbar: document.getElementById('addrbar'),
   contractAddr: document.getElementById('contractAddr'),
   toast: document.getElementById('toast'),
+  btnUp: document.getElementById('btnUp'),
+  btnDown: document.getElementById('btnDown'),
+  btnLeft: document.getElementById('btnLeft'),
+  btnRight: document.getElementById('btnRight'),
+  gameWrap: document.getElementById('gameWrap'),
 };
-// Read runtime config
 const CFG = (window.APP_CONFIG || {});
 if (CFG.X_URL){ els.xLink.href = CFG.X_URL; els.xLink.style.display = 'inline-flex'; }
 if (CFG.CONTRACT_ADDRESS){
   els.addrbar.style.display = 'flex';
   els.contractAddr.textContent = CFG.CONTRACT_ADDRESS;
   els.contractAddr.addEventListener('click', async ()=>{
-    try{
-      await navigator.clipboard.writeText(CFG.CONTRACT_ADDRESS);
-      showToast('Copied!');
-    } catch {
-      showToast('Copy failed');
-    }
+    try{ await navigator.clipboard.writeText(CFG.CONTRACT_ADDRESS); showToast('Copied!'); }
+    catch { showToast('Copy failed'); }
   });
 }
-function showToast(msg){
-  els.toast.textContent = msg;
-  els.toast.style.display = 'block';
-  setTimeout(()=> els.toast.style.display = 'none', 1200);
-}
-
-// Modal content
+function showToast(msg){ els.toast.textContent = msg; els.toast.style.display = 'block'; setTimeout(()=> els.toast.style.display = 'none', 1200); }
 const HOW_TEXT = `1. Compete in the mini-game
 Play the snake game and try to achieve your higest score.
 
@@ -60,14 +54,11 @@ Prize Distribution
 
 good luck and have fun!`;
 els.howText.textContent = HOW_TEXT;
-// Modal controls
 function openModal(){ els.modal.style.display='flex'; els.backdrop.style.display='block'; }
 function closeModalFn(){ els.modal.style.display='none'; els.backdrop.style.display='none'; }
 els.howBtn.addEventListener('click', openModal);
 els.closeModal.addEventListener('click', closeModalFn);
 els.backdrop.addEventListener('click', closeModalFn);
-
-// Wallet validation
 const BASE58_RE = /^[1-9A-HJ-NP-Za-km-z]+$/;
 function isLikelySolAddress(s) { return !!s && BASE58_RE.test(s) && s.length >= 32 && s.length <= 44; }
 const LOCAL_KEY = 'arcade:wallet';
@@ -86,8 +77,6 @@ els.playBtn.addEventListener('click', ()=>{
   if (!isLikelySolAddress(w)) { alert('Enter a valid-looking Solana address (Base58, 32–44 chars).'); return; }
   els.board.focus();
 });
-
-// 30m Window helpers
 function currentWindowId(){ return Math.floor(Date.now() / (30*60*1000)); }
 let windowId = currentWindowId();
 function ensureLocalWindow(){
@@ -99,28 +88,17 @@ function ensureLocalWindow(){
   }
 }
 ensureLocalWindow();
-
-// Rewards timer
 function next30mWindow(){ const now = new Date(); const add = 30 - (now.getMinutes() % 30); const end = new Date(now.getTime() + add*60000); end.setSeconds(0,0); return end; }
 function refreshTimer(){
   const target = next30mWindow();
   (function tick(){
     const now = new Date(); let diff = target - now;
-    if (diff <= 0){
-      windowId = currentWindowId();
-      ensureLocalWindow();
-      fetch('./api/reset-if-needed').catch(()=>{});
-      return refreshTimer();
-    }
-    const mm = String(Math.floor(diff/60000)).padStart(2,'0');
-    const ss = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-    els.timer.textContent = `${mm}:${ss}`;
-    setTimeout(tick, 200);
+    if (diff <= 0){ windowId = currentWindowId(); ensureLocalWindow(); fetch('./api/reset-if-needed').catch(()=>{}); return refreshTimer(); }
+    const mm = String(Math.floor(diff/60000)).padStart(2,'0'); const ss = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    els.timer.textContent = `${mm}:${ss}`; setTimeout(tick, 200);
   })();
 }
 refreshTimer();
-
-// Snake game
 const ctx = els.board.getContext('2d');
 const W = els.board.width, H = els.board.height;
 const CELL = 20;
@@ -130,27 +108,12 @@ let game = null, loopId = 0;
 function resetGame(){
   const startX = Math.floor(COLS/2);
   const startY = Math.floor(ROWS/2);
-  game = {
-    snake: [{x:startX, y:startY}, {x:startX-1, y:startY}, {x:startX-2, y:startY}],
-    dir: {x:1, y:0},
-    nextDir: {x:1, y:0},
-    food: spawnFood([{x:startX, y:startY},{x:startX-1,y:startY},{x:startX-2,y:startY}]),
-    score: 0,
-    speedMs: 140,
-    running: false,
-    over: false,
-  };
-  els.score.textContent = '0';
-  draw();
-  showHint(true);
+  game = { snake: [{x:startX, y:startY}, {x:startX-1, y:startY}, {x:startX-2, y:startY}], dir: {x:1, y:0}, nextDir: {x:1, y:0},
+           food: spawnFood([{x:startX, y:startY},{x:startX-1,y:startY},{x:startX-2,y:startY}]), score: 0, speedMs: 140, running: false, over: false };
+  els.score.textContent = '0'; draw(); showHint(true);
 }
-function spawnFood(blocked){
-  while (true){
-    const fx = Math.floor(Math.random()*COLS);
-    const fy = Math.floor(Math.random()*ROWS);
-    if (!blocked.some(s => s.x===fx && s.y===fy)) return {x:fx, y:fy};
-  }
-}
+function spawnFood(blocked){ while (true){ const fx = Math.floor(Math.random()*COLS), fy = Math.floor(Math.random()*ROWS);
+  if (!blocked.some(s => s.x===fx && s.y===fy)) return {x:fx, y:fy}; } }
 function drawGrid(){ ctx.fillStyle = '#081019'; ctx.fillRect(0,0,W,H); ctx.strokeStyle = 'rgba(136,146,166,0.06)'; ctx.lineWidth = 1;
   for (let x=0;x<=COLS;x++){ ctx.beginPath(); ctx.moveTo(x*CELL+0.5,0); ctx.lineTo(x*CELL+0.5,H); ctx.stroke(); }
   for (let y=0;y<=ROWS;y++){ ctx.beginPath(); ctx.moveTo(0,y*CELL+0.5); ctx.lineTo(W,y*CELL+0.5); ctx.stroke(); } }
@@ -162,21 +125,20 @@ function draw(){ drawGrid(); drawFood(); drawSnake(); drawScore(); }
 function tick(){
   game.dir = game.nextDir;
   const newHead = { x: game.snake[0].x + game.dir.x, y: game.snake[0].y + game.dir.y };
-  if (newHead.x < 0 || newHead.y < 0 || newHead.x >= COLS || newHead.y >= ROWS){ return gameOver(); }
-  if (game.snake.some(s => s.x===newHead.x && s.y===newHead.y)){ return gameOver(); }
+  if (newHead.x < 0 || newHead.y < 0 || newHead.x >= COLS || newHead.y >= ROWS) return gameOver();
+  if (game.snake.some(s => s.x===newHead.x && s.y===newHead.y)) return gameOver();
   game.snake.unshift(newHead);
-  if (newHead.x === game.food.x && newHead.y === game.food.y){
-    game.score += 10; els.score.textContent = game.score; game.speedMs = Math.max(70, game.speedMs - 4); game.food = spawnFood(game.snake);
-  } else { game.snake.pop(); }
+  if (newHead.x === game.food.x && newHead.y === game.food.y){ game.score += 10; els.score.textContent = game.score; game.speedMs = Math.max(70, game.speedMs - 4); game.food = spawnFood(game.snake); }
+  else { game.snake.pop(); }
   draw(); scheduleNext();
 }
 function scheduleNext(){ if (!game.running) return; loopId = setTimeout(tick, game.speedMs); }
 function startGame(){ if (!game || game.over) resetGame(); if (game.running) return; game.running = true; showHint(false); scheduleNext(); }
 function pauseGame(){ game.running = false; clearTimeout(loopId); }
 function gameOver(){ game.running = false; game.over = true; clearTimeout(loopId); draw(); drawOverlay('Game Over', `Score: ${game.score}`); submitScore(); showHint(true); }
-function drawOverlay(text, sub){ ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#e6edf3'; ctx.font='700 26px system-ui,-apple-system,Segoe UI,Roboto,Arial'; ctx.textAlign='center'; ctx.fillText(text,W/2,H/2-8); ctx.font='400 16px system-ui,-apple-system,Segoe UI,Roboto,Arial'; ctx.fillStyle='#8892a6'; if (sub) ctx.fillText(sub,W/2,H/2+20); }
+function drawOverlay(text, sub){ ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#e6edf3'; ctx.font='700 26px system-ui,-apple-system,Segoe UI,Roboto,Arial'; ctx.textAlign='center'; ctx.fillText(text,W/2,H/2-8);
+  ctx.font='400 16px system-ui,-apple-system,Segoe UI,Roboto,Arial'; ctx.fillStyle='#8892a6'; if (sub) ctx.fillText(sub,W/2,H/2+20); }
 function showHint(on){ els.tapHint.style.display = on ? 'grid' : 'none'; }
-// Input
 function setDir(x,y){ if (game && (game.dir.x === -x && game.dir.y === -y)) return; game.nextDir = {x,y}; }
 document.addEventListener('keydown', (e)=>{
   const k = e.key.toLowerCase();
@@ -188,9 +150,31 @@ document.addEventListener('keydown', (e)=>{
 });
 els.start.addEventListener('click', startGame);
 els.pause.addEventListener('click', pauseGame);
-// Init
+[['btnUp',0,-1],['btnDown',0,1],['btnLeft',-1,0],['btnRight',1,0]].forEach(([id,x,y])=>{
+  const b = els[id]; if (!b) return;
+  b.addEventListener('click', ()=>{ setDir(x,y); startGame(); });
+  b.addEventListener('touchstart', (e)=>{ e.preventDefault(); setDir(x,y); startGame(); }, {passive:false});
+});
+let touchStart = null;
+function onTouchStart(e){ if (!e.touches || e.touches.length!==1) return; touchStart = {x:e.touches[0].clientX, y:e.touches[0].clientY}; }
+function onTouchMove(e){ if (!touchStart) return; e.preventDefault(); }
+function onTouchEnd(e){
+  if (!touchStart) return;
+  const t = e.changedTouches ? e.changedTouches[0] : null;
+  if (!t) { touchStart = null; return; }
+  const dx = t.clientX - touchStart.x;
+  const dy = t.clientY - touchStart.y;
+  const ax = Math.abs(dx), ay = Math.abs(dy);
+  const TH = 24;
+  if (ax<TH && ay<TH){ touchStart = null; return; }
+  if (ax > ay){ setDir(dx>0?1:-1,0); } else { setDir(0, dy>0?1:-1); }
+  startGame();
+  touchStart = null;
+}
+els.gameWrap.addEventListener('touchstart', onTouchStart, {passive:true});
+els.gameWrap.addEventListener('touchmove', onTouchMove, {passive:false});
+els.gameWrap.addEventListener('touchend', onTouchEnd, {passive:true});
 resetGame();
-// Leaderboard — unique by wallet, keep best; client shows top 10; highlight top 3
 async function fetchLeaderboard(){
   els.lbStatus.textContent = 'Loading…';
   try{

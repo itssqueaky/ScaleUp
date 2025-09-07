@@ -1,6 +1,6 @@
 {
   "name": "scaleup-snake",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "type": "module",
   "scripts": { "start": "node server.js" },
   "dependencies": { "express": "^4.19.2" }

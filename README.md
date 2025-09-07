@@ -1,15 +1,11 @@
-# ScaleUp — Snake (v1.3)
+# ScaleUp — Snake (Render-ready v6)
 
-New:
-- **X.com icon/link** top-left (hidden until you set `X_URL`).
-- **Sticky address bar** at bottom showing **only** the contract address; click-to-copy with toast.
+- Mobilstøtte: on-screen D-pad + swipe.
+- Fjernet footer-tekst.
+- Beholder: Top-3 highlight, 30m auto-reset (client+server), unik wallet per plass, +10 score, X-ikon, sticky contract bar.
+- Render-klar: vedvarende disk via `DATA_DIR`, runtime `/config.js` fra env vars.
 
-Runtime-config (no rebuild needed): edit `public/config.js`
-```js
-window.APP_CONFIG = {
-  X_URL: "https://x.com/yourhandle",
-  CONTRACT_ADDRESS: "So1anaBase58AddressGoesHere..."
-};
-```
-
-Still included: Top-3 highlight, 30m auto-reset (client+server), unique-per-wallet Top 10, +10 scoring, modal text, hero copy.
+Deploy på Render:
+- Build: `npm install` | Start: `npm start`
+- Env-vars: `NODE_ENV=production`, `DATA_DIR=/data`, valgfritt `X_URL`, `CONTRACT_ADDRESS`
+- Disk: mount `/data`
